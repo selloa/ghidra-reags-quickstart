@@ -113,11 +113,12 @@ def build_html(meta: dict[str, str], body_html: str) -> str:
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
   <title>{title}</title>
   <meta name="description" content="Step-by-step guide: extract AGS game scripts with AGSUnpacker and decompile them in Ghidra 10.4 with ReAGS.">
   <link rel="stylesheet" href="assets/tutorial.css">
 </head>
-<body class="markdown-export" data-theme="light">
+<body class="markdown-export" data-theme="dark">
   <header class="site-header">
     <div class="wrap">
       <h1>{title}</h1>

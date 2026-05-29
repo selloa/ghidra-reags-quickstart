@@ -1,6 +1,6 @@
 ---
 title: Ghidra-ReAGS Quick Start
-version: 0.1.0
+version: 0.1.1
 date: 2026-05-29
 status: draft
 ---
