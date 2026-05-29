@@ -984,3 +984,42 @@ body.markdown-export[data-theme="dark"] footer.site-footer code {
 body.markdown-export[data-theme="dark"] input[type="checkbox"] {
   accent-color: #58a6ff;
 }
+
+/* Google Translate widget */
+.site-translate {
+  margin-bottom: 0.5rem;
+  opacity: 0.75;
+  font-size: 0.75rem;
+}
+
+#google_translate_element select {
+  background: #161b22;
+  color: #c9d1d9;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 0.3rem 0.5rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 0.8rem;
+}
+
+.goog-te-gadget {
+  font-size: 0 !important;
+  color: transparent !important;
+}
+
+.goog-te-gadget select {
+  font-size: 0.8rem !important;
+}
+
+.goog-te-gadget a {
+  display: none !important;
+}
+
+.goog-te-banner-frame.skiptranslate,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}

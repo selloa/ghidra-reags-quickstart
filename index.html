@@ -11,8 +11,9 @@
 <body class="markdown-export" data-theme="dark">
   <header class="site-header">
     <div class="wrap">
+      <div id="google_translate_element" class="site-translate"></div>
       <h1>Ghidra-ReAGS Quick Start</h1>
-      <p class="meta">Version 0.1.1 · 2026-05-29 · draft</p>
+      <p class="meta">Version 0.1.2 · 2026-05-29 · draft</p>
     </div>
   </header>
   <div id="markview-container" class="markdown-body code-block-scroll" style="max-width:1000px">
@@ -388,7 +389,20 @@
     <hr>
   </div>
   <footer class="site-footer">
-    <p>Built from <code>tutorial.md</code> · v0.1.1 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
+    <p>Built from <code>tutorial.md</code> · v0.1.2 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
   </footer>
+  <script>
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+      {
+        pageLanguage: 'en',
+        includedLanguages: 'en,de,fr,es,it,pt,ru,ja,ko,zh-CN',
+        layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+      },
+      'google_translate_element'
+    );
+  }
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>

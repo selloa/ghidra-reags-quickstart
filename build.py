@@ -121,6 +121,7 @@ def build_html(meta: dict[str, str], body_html: str) -> str:
 <body class="markdown-export" data-theme="dark">
   <header class="site-header">
     <div class="wrap">
+      <div id="google_translate_element" class="site-translate"></div>
       <h1>{title}</h1>
       <p class="meta">Version {version} · {date} · {status}</p>
     </div>
@@ -131,6 +132,19 @@ def build_html(meta: dict[str, str], body_html: str) -> str:
   <footer class="site-footer">
     <p>Built from <code>tutorial.md</code> · v{version} · {date} · <a href="https://github.com/selloa">selloa</a></p>
   </footer>
+  <script>
+  function googleTranslateElementInit() {{
+    new google.translate.TranslateElement(
+      {{
+        pageLanguage: 'en',
+        includedLanguages: 'en,de,fr,es,it,pt,ru,ja,ko,zh-CN',
+        layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL,
+      }},
+      'google_translate_element'
+    );
+  }}
+  </script>
+  <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 </body>
 </html>
 """
