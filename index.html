@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghidra-ReAGS Quick Start</title>
+  <meta name="description" content="Step-by-step guide: extract AGS game scripts with AGSUnpacker and decompile them in Ghidra 10.4 with ReAGS.">
+  <link rel="stylesheet" href="assets/tutorial.css">
+</head>
+<body class="markdown-export" data-theme="light">
+  <header class="site-header">
+    <div class="wrap">
+      <h1>Ghidra-ReAGS Quick Start</h1>
+      <p class="meta">Version 0.1.0 · 2026-05-29 · draft</p>
+    </div>
+  </header>
+  <div id="markview-container" class="markdown-body code-block-scroll" style="max-width:1000px">
+    <h1 id="ghidra-reags-quick-start">Ghidra-ReAGS Quick Start</h1>
+    <p><em>Decompile Adventure Game Studio game scripts on Windows — no command line required.</em></p>
+    <p>This guide walks you through extracting compiled AGS scripts from a game with <strong>AGSUnpacker</strong>, opening them in <strong>Ghidra 10.4</strong> with the <strong>ReAGS</strong> extension, and exporting pseudo-C decompilation output. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.</p>
+    <hr>
+    <h2 id="before-you-start">Before you start</h2>
+    <h3 id="what-you-need">What you need</h3>
+    <ul class="task-list">
+    <li class="task-list-item"><input type="checkbox"> A Windows PC</li>
+    <li class="task-list-item"><input type="checkbox"> The game's <strong><code>.exe</code></strong> file (your copy of the game you want to inspect)</li>
+    <li class="task-list-item"><input type="checkbox"> <strong><a href="https://dotnet.microsoft.com/en-us/download/dotnet/6.0">.NET 6 Desktop Runtime</a></strong> (required to run AGSUnpacker — install if <code>AGSUnpacker.exe</code> refuses to start)</li>
+    <li class="task-list-item"><input type="checkbox"> A <strong>64-bit JDK</strong> for Ghidra (Ghidra 10.4 officially requires <strong>JDK 17</strong> or newer — see Step 3)</li>
+    <li class="task-list-item"><input type="checkbox"> About <strong>2 GB</strong> free disk space (Ghidra download ~353 MB, ~1 GB installed, plus JDK ~112 MB and project files)</li>
+    <li class="task-list-item"><input type="checkbox"> [TODO: time estimate — e.g. "About 45–60 minutes the first time"]</li>
+    </ul>
+    <h3 id="what-you-will-end-up-with">What you will end up with</h3>
+    <ul>
+    <li>A folder of <code>.scom3</code> script files extracted from the game</li>
+    <li>A Ghidra project containing one imported script</li>
+    <li>An exported <strong><code>.c</code></strong> file with Ghidra's pseudo-C decompilation attempt (one file per imported script)</li>
+    </ul>
+    <blockquote>
+    <p><strong>Important:</strong> Use <strong>AGSUnpacker</strong> for the extraction step. Do not substitute another tool for that part.</p>
+    </blockquote>
+    <h3 id="downloads-bookmark-these">Downloads (bookmark these)</h3>
+    <table>
+    <thead>
+    <tr>
+    <th>Tool</th>
+    <th>Version / file</th>
+    <th>Link</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>AGSUnpacker</td>
+    <td><strong>v010</strong> — <code>AGSUnpacker_v010_x64.zip</code> (~452 KB) → run <strong><code>AGSUnpacker.exe</code></strong></td>
+    <td><a href="https://github.com/adm244/AGSUnpacker/releases/tag/v010">AGSUnpacker v010 release</a></td>
+    </tr>
+    <tr>
+    <td>Ghidra</td>
+    <td><strong>10.4</strong> — <code>ghidra_10.4_PUBLIC_20230928.zip</code> (~353 MB)</td>
+    <td><a href="https://github.com/NationalSecurityAgency/ghidra/releases/download/Ghidra_10.4_build/ghidra_10.4_PUBLIC_20230928.zip">Ghidra 10.4 release (direct zip)</a> · <a href="https://github.com/NationalSecurityAgency/ghidra/releases/tag/Ghidra_10.4_build">All releases</a></td>
+    </tr>
+    <tr>
+    <td>ReAGS</td>
+    <td><strong>20240301</strong> — <code>ghidra_10_4_PUBLIC_20240301_ReAGS.zip</code> (~64 KB) · Ghidra <strong>10.4</strong> only</td>
+    <td><a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301 release</a></td>
+    </tr>
+    <tr>
+    <td>Temurin JDK</td>
+    <td><strong>17+</strong> (64-bit) — Ghidra requires a JDK; we use Temurin below, but other installs work</td>
+    <td><a href="https://adoptium.net/temurin/releases/?version=17">Adoptium Temurin JDK 17</a></td>
+    </tr>
+    </tbody>
+    </table>
+    <hr>
+    <h2 id="step-1-extract-scom3-scripts-with-agsunpacker">Step 1: Extract <code>.scom3</code> scripts with AGSUnpacker</h2>
+    <p>AGS games store compiled scripts inside the game data. <strong>AGSUnpacker</strong> pulls those out as <code>.scom3</code> files you can open in Ghidra.</p>
+    <ol>
+    <li>Download <strong><code>AGSUnpacker_v010_x64.zip</code></strong> (~452 KB) from the <a href="https://github.com/adm244/AGSUnpacker/releases/tag/v010">AGSUnpacker v010 release</a>.<br>
+       - Use the <strong>x64</strong> zip on normal 64-bit Windows PCs.</li>
+    <li>Unzip the download. You should get a folder named <strong><code>AGSUnpacker_v010_x64</code></strong> containing <strong><code>AGSUnpacker.exe</code></strong> and a few support files.</li>
+    <li>Double-click <strong><code>AGSUnpacker.exe</code></strong> to open the program.<br>
+       - If Windows says the app cannot run, install the <strong><a href="https://dotnet.microsoft.com/en-us/download/dotnet/6.0">.NET 6 Desktop Runtime</a></strong> first, then try again.</li>
+    <li>Click <strong><code>Unpack Assets</code></strong> and select your game's <strong><code>.exe</code></strong> file.</li>
+    <li>Click <strong><code>Extract Scripts from Assets</code></strong>.</li>
+    </ol>
+    <h3 id="you-should-see">You should see</h3>
+    <ul>
+    <li>A <strong><code>scripts</code></strong> folder containing many <strong><code>.scom3</code></strong> files — including <strong><code>globalscript.scom3</code></strong> (the main game script) and room scripts such as <strong><code>room1.scom3</code></strong>, <strong><code>room2.scom3</code></strong>, etc.</li>
+    <li>[TODO: Confirm exactly where AGSUnpacker writes the <code>scripts</code> folder — same directory as the unpacked assets? Next to the game <code>.exe</code>?]</li>
+    </ul>
+    <p><img loading="lazy" alt="AGSUnpacker v0.10 — click Unpack Assets, then Extract Scripts from Assets" src="media/step-01-agsunpacker-buttons.png"></p>
+    <blockquote>
+    <p><strong>Tip:</strong> Run <strong><code>Unpack Assets</code></strong> before <strong><code>Extract Scripts from Assets</code></strong>. Leave the <code>.scom3</code> files where AGSUnpacker puts them — you will import one into Ghidra in a later step. <strong><code>globalscript.scom3</code></strong> is a good first choice.</p>
+    </blockquote>
+    <hr>
+    <h2 id="step-2-download-and-unzip-ghidra-104">Step 2: Download and unzip Ghidra 10.4</h2>
+    <p>ReAGS is built for <strong>Ghidra 10.4</strong> only. At the time of writing, <a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301</a> is the only release — do not mix it with other Ghidra versions.</p>
+    <ol>
+    <li>Download <strong><code>ghidra_10.4_PUBLIC_20230928.zip</code></strong> (~353 MB) from the <a href="https://github.com/NationalSecurityAgency/ghidra/releases/tag/Ghidra_10.4_build">Ghidra 10.4 release</a>.</li>
+    <li>Unzip the download into a folder on your PC.<br>
+       - After unzipping you should have a folder named <strong><code>ghidra_10.4_PUBLIC</code></strong> (unpacked size is roughly <strong>1 GB</strong>).<br>
+       - Any location works — e.g. <code>C:\Tools\ghidra_10.4_PUBLIC</code> or your Desktop.<br>
+       - You can use Windows <strong>Extract All</strong>, 7-Zip, or any unzip tool.</li>
+    <li>Open the <strong><code>ghidra_10.4_PUBLIC</code></strong> folder and find <strong><code>ghidraRun.bat</code></strong> in its root (same level as the <code>Ghidra</code> and <code>support</code> folders).</li>
+    </ol>
+    <p><img loading="lazy" alt="The unzipped ghidra_10.4_PUBLIC folder — double-click ghidraRun.bat" src="media/step-02-ghidra-folder.png"></p>
+    <hr>
+    <h2 id="step-3-install-a-jdk-required">Step 3: Install a JDK (required)</h2>
+    <p>Ghidra <strong>always</strong> needs a Java Development Kit — it does not include one. Assume you need to install one unless you already know you have a compatible JDK on your PC.</p>
+    <p>Ghidra 10.4 officially requires a <strong>64-bit JDK 17</strong> or newer. An older or 32-bit Java install on your system will not work.</p>
+    <p>This guide uses <strong><a href="https://adoptium.net/temurin/releases/?version=17">Eclipse Temurin</a></strong> because it is easy to download and install on Windows. You can use another JDK instead — what matters is that it is <strong>recent enough</strong>, <strong>64-bit</strong>, and that you know <strong>where it was installed</strong>.</p>
+    <ol>
+    <li>Go to <a href="https://adoptium.net/temurin/releases/?version=17">Adoptium Temurin JDK 17</a>.</li>
+    <li>Download the <strong>Windows x64 <code>.msi</code> installer</strong> (example filename: <code>OpenJDK25U-jdk_x64_windows_hotspot_25.0.3_9.msi</code> if you pick a newer Temurin build, ~112 MB).</li>
+    <li>Run the installer with the default options.</li>
+    <li>After installation, note the <strong>JDK home directory</strong> — the top-level folder that <strong>contains</strong> <code>bin\java.exe</code>, <strong>not</strong> the <code>bin</code> folder itself. It is usually:</li>
+    </ol>
+    <p><code>C:\Users\YourName\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot</code></p>
+    <p>Replace <code>YourName</code> with your Windows username and adjust the version number to match what you installed.</p>
+    <blockquote>
+    <p><strong>Tip:</strong> Open that folder in File Explorer and confirm you see a <strong><code>bin</code></strong> subfolder with <strong><code>java.exe</code></strong> inside. If you only see <code>java.exe</code> directly, go up one level — that parent folder is your JDK home.</p>
+    </blockquote>
+    <hr>
+    <h2 id="step-4-run-ghidra-for-the-first-time">Step 4: Run Ghidra for the first time</h2>
+    <ol>
+    <li>Double-click <strong><code>ghidraRun.bat</code></strong> (from Step 2).</li>
+    <li>A <strong>command window</strong> opens while Ghidra starts. Watch it on first launch — this is where Ghidra may ask for your JDK path.</li>
+    <li><strong>If Ghidra asks for the JDK home directory:</strong> paste the folder path from Step 3 (no <code>\bin</code> at the end). If a file picker appears, browse to that same folder and confirm.<br>
+       - You only need to do this once. Ghidra remembers the location afterward.</li>
+    <li>Ghidra opens the <strong>Project Manager</strong> window — the main screen where you create projects and import files (not the CodeBrowser yet).</li>
+    </ol>
+    <p><img loading="lazy" alt="Ghidra Project Manager on first launch — no project open yet" src="media/step-04-project-manager-no-project.png"></p>
+    <p>If Ghidra opens to the Project Manager, continue to <strong>Step 5</strong> (Install ReAGS).</p>
+    <p>If you see <strong><code>Failed to find a supported JDK</code></strong> or <strong><code>Java runtime not found</code></strong>, double-check Step 3 — wrong folder, too old a Java version, or a 32-bit install are the usual causes.</p>
+    <hr>
+    <h2 id="step-5-install-the-reags-extension">Step 5: Install the ReAGS extension</h2>
+    <p>ReAGS teaches Ghidra how to read AGS <code>.scom3</code> script files. Download it from the only release published so far:</p>
+    <ol>
+    <li>Download <strong><code>ghidra_10_4_PUBLIC_20240301_ReAGS.zip</code></strong> (~64 KB) from <strong><a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301</a></strong>.<br>
+       - <strong>Do not unzip it</strong> — Ghidra installs the zip as-is.</li>
+    <li>In Ghidra, open <strong><code>File</code></strong> → <strong><code>Install Extensions...</code></strong></li>
+    <li>In the Install Extensions window, click the <strong>green plus (+)</strong> button.</li>
+    <li>Select the ReAGS <code>.zip</code> file and click <strong><code>OK</code></strong>.</li>
+    <li>ReAGS should appear in the list with its checkbox <strong>enabled</strong>.</li>
+    <li>Click <strong><code>OK</code></strong> to close the Install Extensions window.</li>
+    </ol>
+    <p><img loading="lazy" alt="Select the ReAGS zip file after clicking the green plus button" src="media/step-05-reags-select-zip.png"></p>
+    <p><img loading="lazy" alt="ReAGS appears in the list with its checkbox enabled" src="media/step-05-reags-extension-list.png"></p>
+    <blockquote>
+    <p><strong>Important:</strong> <strong>Restart Ghidra completely</strong> — close it and open <code>ghidraRun.bat</code> again — even if Ghidra does not tell you to. ReAGS may not work until you do.</p>
+    </blockquote>
+    <hr>
+    <h2 id="step-6-create-a-project-and-import-a-scom3-file">Step 6: Create a project and import a <code>.scom3</code> file</h2>
+    <h3 id="create-a-new-project">Create a new project</h3>
+    <ol>
+    <li>In Ghidra, open <strong><code>File</code></strong> → <strong><code>New Project...</code></strong></li>
+    <li>Select <strong><code>Non-Shared Project</code></strong> and click <strong><code>Next</code></strong>.</li>
+    <li>Choose a <strong>project folder</strong> (where Ghidra stores project files on your PC).</li>
+    <li>Enter a <strong>project name</strong> and click <strong><code>Finish</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="New Project — choose Non-Shared Project" src="media/step-06-new-project-type.png"></p>
+    <p><img loading="lazy" alt="Choose a project folder and name, then click Finish" src="media/step-06-new-project-location.png"></p>
+    <blockquote>
+    <p><strong>Tip:</strong> ReAGS works on <strong><code>.scom3</code> script files</strong>, not the game <code>.exe</code>. A common first import is <strong><code>globalscript.scom3</code></strong>. Pick any project name you like — e.g. <code>MyGameScripts</code>.</p>
+    </blockquote>
+    <h3 id="import-a-script-file">Import a script file</h3>
+    <ol>
+    <li>Open <strong><code>File</code></strong> → <strong><code>Import File...</code></strong></li>
+    <li>Browse to the <strong><code>scripts</code></strong> folder from Step 1.</li>
+    <li>Select any <code>.scom3</code> file and click <strong><code>OK</code></strong> / <strong><code>Open</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="File → Import File" src="media/step-06-import-file-menu.png"></p>
+    <p><img loading="lazy" alt="Browse to your .scom3 file — e.g. GlobalScript.scom3" src="media/step-06-import-file-picker.png"></p>
+    <h3 id="check-the-import-dialog">Check the Import dialog</h3>
+    <p>Before you confirm the import, verify these two lines:</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Field</th>
+    <th>Expected value</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><strong>Format</strong></td>
+    <td><code>Adventure Game Studio compiled script (scom3)</code></td>
+    </tr>
+    <tr>
+    <td><strong>Language</strong></td>
+    <td><code>AGSVM:LE.32:default:default</code> — <strong>AGSVM</strong> is the important part</td>
+    </tr>
+    </tbody>
+    </table>
+    <p><img loading="lazy" alt="Import dialog — Format and Language should match these values" src="media/step-06-import-format-language.png"></p>
+    <ol start="4">
+    <li>Click <strong><code>OK</code></strong> to import.</li>
+    <li>When the <strong>Import Results Summary</strong> appears, click <strong><code>OK</code></strong>.</li>
+    </ol>
+    <blockquote>
+    <p><strong>If Format or Language look wrong:</strong> ReAGS is probably not installed or not loaded. Go back to <strong>Step 5</strong>, confirm the extension is enabled, <strong>restart Ghidra</strong>, and try again.</p>
+    </blockquote>
+    <hr>
+    <h2 id="step-7-analyze-the-imported-script">Step 7: Analyze the imported script</h2>
+    <ol>
+    <li>In the <strong>Active Project</strong> window, open the folder named after your project.</li>
+    <li>Double-click your imported <code>.scom3</code> file — or right-click it and choose <strong><code>Open With</code></strong> → <strong><code>CodeBrowser</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="Your imported .scom3 file in the Active Project window" src="media/step-07-project-with-scom3.png"></p>
+    <ol start="3">
+    <li>Ghidra will ask whether you want to analyze the file now. Click <strong><code>Yes</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="Click Yes when Ghidra asks to analyze the file" src="media/step-07-analyze-prompt.png"></p>
+    <ol start="4">
+    <li>The <strong>Analysis Options</strong> window opens with many checkboxes. Leave the defaults as they are, but confirm these two are <strong>checked</strong>:<br>
+       - <strong><code>Scom3 Function Analyzer</code></strong><br>
+       - <strong><code>Script format analyzer</code></strong></li>
+    <li>Click <strong><code>Analyze</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="Analysis Options — confirm Scom3 Function Analyzer and Script format analyzer are checked" src="media/step-07-analysis-options.png"></p>
+    <p>Wait for analysis to finish. Progress appears in the <strong>status bar</strong> at the bottom of CodeBrowser; when analysis is done, that progress indicator stops and you can click functions in the Symbol Tree.</p>
+    <blockquote>
+    <p><strong>You are almost done.</strong> You can jump ahead to <strong>Step 9</strong> (Export) now, or continue to Step 8 for a quick look around.</p>
+    <p><strong>Important:</strong> Export your <strong><code>.c</code></strong> file (Step 9) <strong>before</strong> closing the CodeBrowser window. ReAGS may not keep your analysis when you close it.</p>
+    </blockquote>
+    <hr>
+    <h2 id="step-8-browse-functions-and-decompiled-output-optional">Step 8: Browse functions and decompiled output (optional)</h2>
+    <p>This step shows you where Ghidra puts the readable-ish output. You do not need to understand everything here.</p>
+    <ol>
+    <li>In the CodeBrowser <strong>left sidebar</strong>, find <strong><code>Symbol Tree</code></strong>.</li>
+    <li>Expand <strong><code>Functions</code></strong>.</li>
+    <li>Click a <strong>named</strong> function — one that looks like game logic (e.g. <strong><code>game_start</code></strong>, <strong><code>SetObjectPosition$3</code></strong>, <strong><code>dialog_request_1</code></strong>) rather than auto-generated names like <strong><code>FUN_08001234</code></strong>.<br>
+       - The <strong>Decompile</strong> panel shows <strong>one function at a time</strong>. Click a different function in the tree to switch what you see.</li>
+    </ol>
+    <p><img loading="lazy" alt="CodeBrowser — Symbol Tree, Listing, and Decompile panel with a function selected" src="media/step-08-codebrowser-decompile.png"></p>
+    <ol start="4">
+    <li>In the center <strong>Listing</strong> view, the cursor should jump to that function — something like:</li>
+    </ol>
+    <p><code>undefined GetSoundNumber$1</code></p>
+    <ol start="5">
+    <li>In the right <strong>Decompile</strong> panel, Ghidra shows pseudo-C code — an automated guess at what the original AGS script might have looked like.</li>
+    </ol>
+    <p>The output will not match the original AGS source file line-for-line — expect odd variable names, missing structure, and some functions that decompile poorly. Many users still find it readable enough to reconstruct lost script logic.</p>
+    <p>For deeper reading after this tutorial, see <strong>Further reading</strong> below.</p>
+    <hr>
+    <h2 id="step-9-export-the-decompilation">Step 9: Export the decompilation</h2>
+    <ol>
+    <li>In CodeBrowser, open <strong><code>File</code></strong> → <strong><code>Export Program...</code></strong></li>
+    <li>Set <strong>Format</strong> to <strong><code>C/C++</code></strong>.</li>
+    <li>Set <strong>Output File</strong> to a new name — <strong>do not overwrite</strong> your original <code>.scom3</code> file.<br>
+       - Pick a folder and a filename such as <code>globalscript_export</code> (Ghidra adds the <strong><code>.c</code></strong> extension).</li>
+    <li>Click <strong><code>OK</code></strong>.</li>
+    </ol>
+    <p><img loading="lazy" alt="File → Export Program" src="media/step-09-export-file-menu.png"></p>
+    <p><img loading="lazy" alt="Export dialog — Format C/C++, pick an output path" src="media/step-09-export-dialog.png"></p>
+    <h3 id="you-should-see_1">You should see</h3>
+    <ul>
+    <li>A new <strong><code>.c</code></strong> file on disk (e.g. <code>globalscript_export.c</code>) containing pseudo-C for the decompiled functions</li>
+    </ul>
+    <p>Open the exported file in Notepad or any text editor.</p>
+    <blockquote>
+    <p>If it feels like looking into the Matrix or a magic 8 ball, you are on the right track.</p>
+    </blockquote>
+    <p><img loading="lazy" alt="Exported .c file open in a text editor" src="media/step-09-exported-c-file.png"></p>
+    <hr>
+    <h2 id="summary-checklist">Summary checklist</h2>
+    <p>Use this to confirm you completed every stage:</p>
+    <ul class="task-list">
+    <li class="task-list-item"><input type="checkbox"> Extracted <code>.scom3</code> files with AGSUnpacker</li>
+    <li class="task-list-item"><input type="checkbox"> Downloaded and unzipped Ghidra <strong>10.4</strong></li>
+    <li class="task-list-item"><input type="checkbox"> Ghidra launches successfully (<code>ghidraRun.bat</code>)</li>
+    <li class="task-list-item"><input type="checkbox"> Installed a <strong>64-bit JDK</strong> and pointed Ghidra at it (Step 3–4)</li>
+    <li class="task-list-item"><input type="checkbox"> Installed <strong>ReAGS 20240301</strong> from the <code>.zip</code> and <strong>restarted Ghidra</strong></li>
+    <li class="task-list-item"><input type="checkbox"> Created a Non-Shared project</li>
+    <li class="task-list-item"><input type="checkbox"> Imported a <code>.scom3</code> — Format and Language matched the expected values</li>
+    <li class="task-list-item"><input type="checkbox"> Ran analysis with <strong>Scom3 Function Analyzer</strong> and <strong>Script format analyzer</strong></li>
+    <li class="task-list-item"><input type="checkbox"> Exported decompilation as <strong>C/C++</strong></li>
+    <li class="task-list-item"><input type="checkbox"> Opened the exported file and confirmed it contains text output</li>
+    </ul>
+    <hr>
+    <h2 id="troubleshooting">Troubleshooting</h2>
+    <h3 id="import-shows-the-wrong-format-or-language">Import shows the wrong Format or Language</h3>
+    <ul>
+    <li>Confirm you are running <strong>Ghidra 10.4</strong> with <strong>ReAGS 20240301</strong> — the <a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">only ReAGS release</a> at the time of writing.</li>
+    <li>Open <strong><code>File</code></strong> → <strong><code>Install Extensions...</code></strong> and verify ReAGS is checked.</li>
+    <li><strong>Restart Ghidra</strong> fully and try importing again.</li>
+    </ul>
+    <h3 id="ghidra-will-not-start-java-errors">Ghidra will not start / Java errors</h3>
+    <ul>
+    <li>Ghidra <strong>always</strong> needs a JDK — install one (Step 3) if you have not yet.</li>
+    <li>Use a <strong>64-bit JDK 17</strong> or newer. Very old Java or 32-bit installs will fail.</li>
+    <li>When pasting the JDK path, use the folder <strong>above</strong> <code>bin</code>, not <code>...\bin</code> itself.</li>
+    <li>Confirm <code>bin\java.exe</code> exists inside the folder you chose.</li>
+    <li>If you already had Java installed, it may be the wrong version — install Temurin (or another current JDK) and point Ghidra at that install instead.</li>
+    </ul>
+    <h3 id="reags-analyzers-do-not-appear-in-analysis-options">ReAGS analyzers do not appear in Analysis Options</h3>
+    <ul>
+    <li>ReAGS is not loaded — repeat Step 5 and restart Ghidra.</li>
+    <li>[TODO: Other causes?]</li>
+    </ul>
+    <h3 id="decompile-window-stays-empty-after-analysis">Decompile window stays empty after analysis</h3>
+    <ul>
+    <li>Click a <strong>named function</strong> in Symbol Tree → <strong>Functions</strong> — the Decompile panel only updates when a function is selected.</li>
+    <li>If the Listing shows <strong><code>??</code></strong> at function addresses, try: select the <strong><code>code</code></strong> memory block → right-click → <strong>Disassemble</strong> → run <strong>Analysis</strong> again.</li>
+    <li>[TODO: Other edge cases you hit during testing]</li>
+    </ul>
+    <h3 id="export-failed-or-file-is-empty">Export failed or file is empty</h3>
+    <ul>
+    <li>Make sure analysis finished and at least some functions decompile when clicked individually.</li>
+    <li>[TODO]</li>
+    </ul>
+    <h3 id="agsunpacker-did-not-produce-a-scripts-folder">AGSUnpacker did not produce a <code>scripts</code> folder</h3>
+    <ul>
+    <li>Make sure you clicked <strong><code>Unpack Assets</code></strong> first, then <strong><code>Extract Scripts from Assets</code></strong> — in that order.</li>
+    <li>Confirm you selected the game's <strong><code>.exe</code></strong>, not a shortcut or unrelated file.</li>
+    <li>AGSUnpacker targets officially released <strong>AGS 2.x and 3.x</strong> games. Very old 1.x games, AGS 4.x, or heavily customized builds may not work.</li>
+    <li>[TODO: Where the <code>scripts</code> folder should appear on disk — verify once and add a screenshot path]</li>
+    </ul>
+    <h3 id="agsunpackerexe-will-not-start">AGSUnpacker.exe will not start</h3>
+    <ul>
+    <li>Install the <strong><a href="https://dotnet.microsoft.com/en-us/download/dotnet/6.0">.NET 6 Desktop Runtime</a></strong> (64-bit). AGSUnpacker v010 is built for <strong>.NET 6</strong> and is not self-contained.</li>
+    </ul>
+    <hr>
+    <h2 id="what-to-expect-from-reags">What to expect from ReAGS</h2>
+    <p>The following is paraphrased from the <a href="https://github.com/adm244/Ghidra-ReAGS">ReAGS README</a> and its <strong>Known issues</strong> list — not original guidance from this tutorial.</p>
+    <p>ReAGS is a <strong>Ghidra 10.4</strong> plugin (same author as AGSUnpacker). The README describes the project as <strong>halfway finished</strong> and <strong>no longer being developed</strong>. <a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301</a> is the <strong>only release</strong> listed at this time.</p>
+    <p>The author notes that ReAGS <strong>can still be used</strong> in its current state, but that users <strong>should not expect a smooth experience</strong>.</p>
+    <p><strong>Known issue (major):</strong> analysis state <strong>is not saved</strong> into project files. According to the README, closing the CodeBrowser window can <strong>lose all work from that session</strong> — so <strong>export the <code>.c</code> file before closing Ghidra</strong>.</p>
+    <p>The README also lists <strong>incorrect decompilation</strong> as a known issue; the author’s wording is that this becomes obvious when reviewing the output.</p>
+    <p>[TODO: Optional — link to assembly/listing as fallback when decompilation fails (author note in Page build notes).]</p>
+    <hr>
+    <h2 id="further-reading">Further reading</h2>
+    <ul class="task-list">
+    <li><a href="https://github.com/adm244/Ghidra-ReAGS">Ghidra-ReAGS README</a> — project status, supported Ghidra version, full known-issues list</li>
+    <li><a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301 release</a></li>
+    <li><a href="https://github.com/adm244/AGSUnpacker">AGSUnpacker README</a> — supported AGS versions, feature list</li>
+    <li><a href="https://github.com/adm244/AGSUnpacker/releases">AGSUnpacker releases</a> — download current builds</li>
+    <li><a href="https://ghidra-sre.org/">Ghidra official site</a></li>
+    <li class="task-list-item"><input type="checkbox"> [TODO: AGS forums / community links]</li>
+    </ul>
+    <hr>
+    <h2 id="reference-links">Reference links</h2>
+    <table>
+    <thead>
+    <tr>
+    <th>Resource</th>
+    <th>URL</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td>Ghidra (official site)</td>
+    <td>https://ghidra-sre.org/</td>
+    </tr>
+    <tr>
+    <td>Ghidra 10.4 download</td>
+    <td>https://github.com/NationalSecurityAgency/ghidra/releases/tag/Ghidra_10.4_build</td>
+    </tr>
+    <tr>
+    <td>Ghidra on GitHub</td>
+    <td>https://github.com/NationalSecurityAgency/ghidra</td>
+    </tr>
+    <tr>
+    <td>Ghidra-ReAGS 20240301</td>
+    <td>https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301</td>
+    </tr>
+    <tr>
+    <td>Ghidra-ReAGS (repo)</td>
+    <td>https://github.com/adm244/Ghidra-ReAGS</td>
+    </tr>
+    <tr>
+    <td>AGSUnpacker v010</td>
+    <td>https://github.com/adm244/AGSUnpacker/releases/tag/v010</td>
+    </tr>
+    <tr>
+    <td>.NET 6 Desktop Runtime</td>
+    <td>https://dotnet.microsoft.com/en-us/download/dotnet/6.0</td>
+    </tr>
+    <tr>
+    <td>Temurin JDK 17 (Adoptium)</td>
+    <td>https://adoptium.net/temurin/releases/?version=17</td>
+    </tr>
+    <tr>
+    <td>Ghidra overview (Wikipedia)</td>
+    <td>https://en.wikipedia.org/wiki/Ghidra</td>
+    </tr>
+    </tbody>
+    </table>
+    <hr>
+  </div>
+  <footer class="site-footer">
+    <p>Built from <code>tutorial.md</code> · v0.1.0 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
+  </footer>
+</body>
+</html>

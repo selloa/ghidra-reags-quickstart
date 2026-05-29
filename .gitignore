@@ -1,0 +1,29 @@
+# Python (build script)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Author drafts (local only)
+notes/
+
+# MarkView design export (~1 MB); CSS lives in assets/tutorial.css
+tutorial-scaffold.html
+
+# Large local media not used by the static page yet
+media/video-*.mp4
+
+# Optional: uncomment if you prefer to build index.html in CI only
+# index.html
