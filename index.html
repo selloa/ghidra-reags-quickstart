@@ -14,7 +14,7 @@
     <div class="wrap">
       <div id="google_translate_element" class="site-translate"></div>
       <h1>Ghidra-ReAGS Quick Start</h1>
-      <p class="meta">Version 0.1.2 · 2026-05-29 · draft</p>
+      <p class="meta">Version 0.1.4 · 2026-05-29 · draft</p>
     </div>
   </header>
   <div class="site-layout">
@@ -43,8 +43,8 @@
     <main id="markview-container" class="markdown-body code-block-scroll">
     <h1 id="ghidra-reags-quick-start">Ghidra-ReAGS Quick Start</h1>
     <p><em>Extract compiled AGS scripts and export Ghidra pseudo-C on Windows — no command line required.</em></p>
-    <p>This guide walks you through extracting compiled AGS scripts from a game with <strong>AGSUnpacker</strong>, opening them in <strong>Ghidra 10.4</strong> with the <strong>ReAGS</strong> extension, and saving the decompiler output as a <strong><code>.c</code> text file</strong>.</p>
-    <p><strong>Important:</strong> the result is <strong>Ghidra pseudo-C</strong> — an automated best guess at the script logic — <strong>not</strong> a recovered copy of the game's original AGS source files. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.</p>
+    <p>This guide walks you through extracting compiled AGS scripts from a game with <strong>AGSUnpacker</strong>, opening them in <strong>Ghidra 10.4</strong> with the <strong>ReAGS</strong> extension, and saving the decompiler output as a <strong><code>.c</code> text file</strong>. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.</p>
+    <p><strong>Important:</strong> the result is <strong>Ghidra pseudo-C</strong> — an automated best guess at the script logic — <strong>not</strong> a recovered copy of the game's original AGS source files.</p>
     <hr>
     <h2 id="before-you-start">Before you start</h2>
     <h3 id="what-you-need">What you need</h3>
@@ -129,7 +129,7 @@
     <tr>
     <td>Temurin JDK</td>
     <td><strong>17+</strong> (64-bit) — Ghidra requires a JDK; we use Temurin below, but other installs work</td>
-    <td><a href="https://adoptium.net/temurin/releases/?version=17">Adoptium Temurin JDK 17</a></td>
+    <td><a href="https://adoptium.net/temurin/releases/">Adoptium Temurin releases</a></td>
     </tr>
     </tbody>
     </table>
@@ -138,7 +138,7 @@
     <p>AGS games store compiled scripts inside the game data. <strong>AGSUnpacker</strong> pulls those out as <code>.scom3</code> files you can open in Ghidra.</p>
     <ol>
     <li>Download <strong><code>AGSUnpacker_v010_x64.zip</code></strong> (~452 KB) from the <a href="https://github.com/adm244/AGSUnpacker/releases/tag/v010">AGSUnpacker v010 release</a>.<br>
-       - Use the <strong>x64</strong> zip on normal 64-bit Windows PCs.</li>
+       - Use the <strong>x64</strong> zip on modern 64-bit Windows PCs.</li>
     <li>Unzip the download. You should get a folder named <strong><code>AGSUnpacker_v010_x64</code></strong> containing <strong><code>AGSUnpacker.exe</code></strong> and a few support files.</li>
     <li>Double-click <strong><code>AGSUnpacker.exe</code></strong> to open the program.<br>
        - If Windows says the app cannot run, install the <strong><a href="https://dotnet.microsoft.com/en-us/download/dotnet/6.0">.NET 6 Desktop Runtime</a></strong> first, then try again.</li>
@@ -154,6 +154,9 @@
     <blockquote>
     <p><strong>Tip:</strong> Run <strong><code>Unpack Assets</code></strong> before <strong><code>Extract Scripts from Assets</code></strong>. Leave the <code>.scom3</code> files where AGSUnpacker puts them — you will import one into Ghidra in a later step. <strong><code>globalscript.scom3</code></strong> is a good first choice.</p>
     </blockquote>
+    <ul>
+    <li>[TODO: screenshot — unzipped <strong><code>AGSUnpacker_v010_x64</code></strong> folder showing <strong><code>AGSUnpacker.exe</code></strong> and support files]</li>
+    </ul>
     <hr>
     <h2 id="step-2-download-and-unzip-ghidra-104">Step 2: Download and unzip Ghidra 10.4</h2>
     <p>ReAGS is built for <strong>Ghidra 10.4</strong> only. At the time of writing, <a href="https://github.com/adm244/Ghidra-ReAGS/releases/tag/20240301">ReAGS 20240301</a> is the only release — do not mix it with other Ghidra versions.</p>
@@ -170,10 +173,10 @@
     <h2 id="step-3-install-a-jdk-required">Step 3: Install a JDK (required)</h2>
     <p>Ghidra <strong>always</strong> needs a Java Development Kit — it does not include one. Assume you need to install one unless you already know you have a compatible JDK on your PC.</p>
     <p>Ghidra 10.4 officially requires a <strong>64-bit JDK 17</strong> or newer. An older or 32-bit Java install on your system will not work.</p>
-    <p>This guide uses <strong><a href="https://adoptium.net/temurin/releases/?version=17">Eclipse Temurin</a></strong> because it is easy to download and install on Windows. You can use another JDK instead — what matters is that it is <strong>recent enough</strong>, <strong>64-bit</strong>, and that you know <strong>where it was installed</strong>.</p>
+    <p>This guide uses <strong><a href="https://adoptium.net/temurin/releases/">Eclipse Temurin</a></strong> because it is easy to download and install on Windows. You can use another JDK instead — what matters is that it is <strong>recent enough</strong>, <strong>64-bit</strong>, and that you know <strong>where it was installed</strong>.</p>
     <ol>
-    <li>Go to <a href="https://adoptium.net/temurin/releases/?version=17">Adoptium Temurin JDK 17</a>.</li>
-    <li>Download the <strong>Windows x64 <code>.msi</code> installer</strong> (example filename: <code>OpenJDK25U-jdk_x64_windows_hotspot_25.0.3_9.msi</code> if you pick a newer Temurin build, ~112 MB).</li>
+    <li>Go to <a href="https://adoptium.net/temurin/releases/">Adoptium Temurin releases</a>.</li>
+    <li>Download the <strong>Windows x64 <code>.msi</code> installer</strong> for a current <strong>JDK</strong> build (pick <strong>17 or newer</strong> — example filename: <code>OpenJDK25U-jdk_x64_windows_hotspot_25.0.3_9.msi</code>, ~112 MB).</li>
     <li>Run the installer with the default options.</li>
     <li>After installation, note the <strong>JDK home directory</strong> — the top-level folder that <strong>contains</strong> <code>bin\java.exe</code>, <strong>not</strong> the <code>bin</code> folder itself. It is usually:</li>
     </ol>
@@ -194,6 +197,14 @@
     <p><img loading="lazy" alt="Ghidra Project Manager on first launch — no project open yet" src="media/step-04-project-manager-no-project.png"></p>
     <p>If Ghidra opens to the Project Manager, continue to <strong>Step 5</strong> (Install ReAGS).</p>
     <p>If you see <strong><code>Failed to find a supported JDK</code></strong> or <strong><code>Java runtime not found</code></strong>, double-check Step 3 — wrong folder, too old a Java version, or a 32-bit install are the usual causes.</p>
+    <h3 id="need-more-help-with-ghidra">Need more help with Ghidra?</h3>
+    <p>If you get stuck getting Ghidra started, the <strong><code>ghidra_10.4_PUBLIC</code></strong> folder includes official 10.4 docs:</p>
+    <ul>
+    <li><strong><code>docs\InstallationGuide.html</code></strong> — install, JDK, and troubleshooting (the <strong>Ghidra Extension Notes</strong> section also covers how to install extensions)</li>
+    <li><strong><code>docs\GhidraClass\Beginner\Introduction_to_Ghidra_Student_Guide_withNotes.html</code></strong> — annotated beginner slideshow</li>
+    </ul>
+    <p>Easier-to-read online copies: <a href="https://ghidradocs.com/10.4_PUBLIC/docs/InstallationGuide.html">Installation Guide</a> · <a href="https://ghidradocs.com/10.4_PUBLIC/docs/GhidraClass/Beginner/Introduction_to_Ghidra_Student_Guide.html">Introduction to Ghidra (Beginner)</a></p>
+    <p>For a broader setup walkthrough (JDK, extensions, and more), see <a href="https://seanthegeek.net/posts/ghidra-setup-guide/">Sean Whalen's Ghidra setup guide</a>.</p>
     <hr>
     <h2 id="step-5-install-the-reags-extension">Step 5: Install the ReAGS extension</h2>
     <p>ReAGS teaches Ghidra how to read AGS <code>.scom3</code> script files. Download it from the only release published so far:</p>
@@ -464,8 +475,8 @@
     <td>https://dotnet.microsoft.com/en-us/download/dotnet/6.0</td>
     </tr>
     <tr>
-    <td>Temurin JDK 17 (Adoptium)</td>
-    <td>https://adoptium.net/temurin/releases/?version=17</td>
+    <td>Temurin JDK (Adoptium)</td>
+    <td>https://adoptium.net/temurin/releases/</td>
     </tr>
     <tr>
     <td>Ghidra overview (Wikipedia)</td>
@@ -477,7 +488,7 @@
     </main>
   </div>
   <footer class="site-footer">
-    <p>Built from <code>tutorial.md</code> · v0.1.2 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
+    <p>Built from <code>tutorial.md</code> · v0.1.4 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
   </footer>
   <script>
   function googleTranslateElementInit() {
