@@ -7,9 +7,11 @@ status: draft
 
 # Ghidra-ReAGS Quick Start
 
-*Decompile Adventure Game Studio game scripts on Windows — no command line required.*
+*Extract compiled AGS scripts and export Ghidra pseudo-C on Windows — no command line required.*
 
-This guide walks you through extracting compiled AGS scripts from a game with **AGSUnpacker**, opening them in **Ghidra 10.4** with the **ReAGS** extension, and exporting pseudo-C decompilation output. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.
+This guide walks you through extracting compiled AGS scripts from a game with **AGSUnpacker**, opening them in **Ghidra 10.4** with the **ReAGS** extension, and saving the decompiler output as a **`.c` text file**.
+
+**Important:** the result is **Ghidra pseudo-C** — an automated best guess at the script logic — **not** a recovered copy of the game's original AGS source files. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.
 
 ---
 
@@ -31,6 +33,19 @@ This guide walks you through extracting compiled AGS scripts from a game with **
 - An exported **`.c`** file with Ghidra's pseudo-C decompilation attempt (one file per imported script)
 
 > **Important:** Use **AGSUnpacker** for the extraction step. Do not substitute another tool for that part.
+
+### Words you'll see
+
+A few terms this guide uses often:
+
+| Term | Plain English |
+|------|---------------|
+| **`.scom3`** | A compiled AGS script file pulled out of a game — bytecode, not readable source text |
+| **AGSVM** | The script format Ghidra/ReAGS expects on import (you will confirm this in the Import dialog) |
+| **Project Manager** | Ghidra's start screen — create projects and import files here |
+| **CodeBrowser** | Ghidra's analysis window — open a `.scom3` here to browse and export results |
+| **pseudo-C** | C-like text Ghidra guesses from the bytecode — not the game's original AGS scripts |
+| **JDK** | Java Development Kit — Ghidra needs this installed separately |
 
 ### Downloads (bookmark these)
 
@@ -216,6 +231,12 @@ Wait for analysis to finish. Progress appears in the **status bar** at the botto
 ## Step 8: Browse functions and decompiled output (optional)
 
 This step shows you where Ghidra puts the readable-ish output. You do not need to understand everything here.
+
+| Panel | Where | What it is |
+|-------|-------|------------|
+| **Symbol Tree** | Left sidebar | Lists function names found in the script |
+| **Listing** | Center | Low-level view of the compiled script |
+| **Decompile** | Right | Ghidra's pseudo-C output for the function you selected |
 
 1. In the CodeBrowser **left sidebar**, find **`Symbol Tree`**.
 2. Expand **`Functions`**.

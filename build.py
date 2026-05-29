@@ -21,6 +21,7 @@ INTERNAL_SECTION = re.compile(r"^## Page build notes\b", re.MULTILINE)
 HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 FRONT_MATTER = re.compile(r"^---\r?\n(.*?)\r?\n---\r?\n", re.DOTALL)
 PRE_BLOCK = re.compile(r"<pre>(.*?)</pre>", re.DOTALL)
+H2_HEADING = re.compile(r'<h2 id="([^"]+)">(.*?)</h2>', re.DOTALL)
 
 
 def slugify(value: str, separator: str) -> str:
@@ -78,6 +79,24 @@ def postprocess_body(html: str) -> str:
     return html
 
 
+def extract_sidebar_nav(body_html: str) -> str:
+    items = []
+    for slug, raw_title in H2_HEADING.findall(body_html):
+        title = re.sub(r"<[^>]+>", "", raw_title).strip()
+        items.append(f'        <li><a href="#{slug}">{title}</a></li>')
+    if not items:
+        return ""
+    links = "\n".join(items)
+    return f"""  <aside class="site-sidebar" aria-label="Page sections">
+    <nav>
+      <p class="site-sidebar-title">On this page</p>
+      <ul>
+{links}
+      </ul>
+    </nav>
+  </aside>"""
+
+
 def render_markdown(content: str) -> str:
     return markdown.markdown(
         content,
@@ -98,7 +117,7 @@ def render_markdown(content: str) -> str:
     )
 
 
-def build_html(meta: dict[str, str], body_html: str) -> str:
+def build_html(meta: dict[str, str], body_html: str, sidebar_nav: str) -> str:
     title = meta.get("title", "Ghidra-ReAGS Quick Start")
     version = meta.get("version", "0.0.0")
     date = meta.get("date", "")
@@ -116,6 +135,7 @@ def build_html(meta: dict[str, str], body_html: str) -> str:
   <meta name="color-scheme" content="dark">
   <title>{title}</title>
   <meta name="description" content="Step-by-step guide: extract AGS game scripts with AGSUnpacker and decompile them in Ghidra 10.4 with ReAGS.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/tutorial.css">
 </head>
 <body class="markdown-export" data-theme="dark">
@@ -126,8 +146,11 @@ def build_html(meta: dict[str, str], body_html: str) -> str:
       <p class="meta">Version {version} · {date} · {status}</p>
     </div>
   </header>
-  <div id="markview-container" class="markdown-body code-block-scroll" style="max-width:1000px">
+  <div class="site-layout">
+{sidebar_nav}
+    <main id="markview-container" class="markdown-body code-block-scroll">
 {indented}
+    </main>
   </div>
   <footer class="site-footer">
     <p>Built from <code>tutorial.md</code> · v{version} · {date} · <a href="https://github.com/selloa">selloa</a></p>
@@ -165,7 +188,8 @@ def main() -> int:
     content = strip_internal_sections(content)
 
     body_html = postprocess_body(render_markdown(content))
-    html = build_html(meta, body_html)
+    sidebar_nav = extract_sidebar_nav(body_html)
+    html = build_html(meta, body_html, sidebar_nav)
     OUTPUT.write_text(html, encoding="utf-8", newline="\n")
     print(f"Wrote {OUTPUT.relative_to(ROOT)} (from {SOURCE.name}, v{meta.get('version', '?')})")
     return 0

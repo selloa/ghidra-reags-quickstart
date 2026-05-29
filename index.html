@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   <title>Ghidra-ReAGS Quick Start</title>
   <meta name="description" content="Step-by-step guide: extract AGS game scripts with AGSUnpacker and decompile them in Ghidra 10.4 with ReAGS.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
   <link rel="stylesheet" href="assets/tutorial.css">
 </head>
 <body class="markdown-export" data-theme="dark">
@@ -16,10 +17,34 @@
       <p class="meta">Version 0.1.2 · 2026-05-29 · draft</p>
     </div>
   </header>
-  <div id="markview-container" class="markdown-body code-block-scroll" style="max-width:1000px">
+  <div class="site-layout">
+  <aside class="site-sidebar" aria-label="Page sections">
+    <nav>
+      <p class="site-sidebar-title">On this page</p>
+      <ul>
+        <li><a href="#before-you-start">Before you start</a></li>
+        <li><a href="#step-1-extract-scom3-scripts-with-agsunpacker">Step 1: Extract .scom3 scripts with AGSUnpacker</a></li>
+        <li><a href="#step-2-download-and-unzip-ghidra-104">Step 2: Download and unzip Ghidra 10.4</a></li>
+        <li><a href="#step-3-install-a-jdk-required">Step 3: Install a JDK (required)</a></li>
+        <li><a href="#step-4-run-ghidra-for-the-first-time">Step 4: Run Ghidra for the first time</a></li>
+        <li><a href="#step-5-install-the-reags-extension">Step 5: Install the ReAGS extension</a></li>
+        <li><a href="#step-6-create-a-project-and-import-a-scom3-file">Step 6: Create a project and import a .scom3 file</a></li>
+        <li><a href="#step-7-analyze-the-imported-script">Step 7: Analyze the imported script</a></li>
+        <li><a href="#step-8-browse-functions-and-decompiled-output-optional">Step 8: Browse functions and decompiled output (optional)</a></li>
+        <li><a href="#step-9-export-the-decompilation">Step 9: Export the decompilation</a></li>
+        <li><a href="#summary-checklist">Summary checklist</a></li>
+        <li><a href="#troubleshooting">Troubleshooting</a></li>
+        <li><a href="#what-to-expect-from-reags">What to expect from ReAGS</a></li>
+        <li><a href="#further-reading">Further reading</a></li>
+        <li><a href="#reference-links">Reference links</a></li>
+      </ul>
+    </nav>
+  </aside>
+    <main id="markview-container" class="markdown-body code-block-scroll">
     <h1 id="ghidra-reags-quick-start">Ghidra-ReAGS Quick Start</h1>
-    <p><em>Decompile Adventure Game Studio game scripts on Windows — no command line required.</em></p>
-    <p>This guide walks you through extracting compiled AGS scripts from a game with <strong>AGSUnpacker</strong>, opening them in <strong>Ghidra 10.4</strong> with the <strong>ReAGS</strong> extension, and exporting pseudo-C decompilation output. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.</p>
+    <p><em>Extract compiled AGS scripts and export Ghidra pseudo-C on Windows — no command line required.</em></p>
+    <p>This guide walks you through extracting compiled AGS scripts from a game with <strong>AGSUnpacker</strong>, opening them in <strong>Ghidra 10.4</strong> with the <strong>ReAGS</strong> extension, and saving the decompiler output as a <strong><code>.c</code> text file</strong>.</p>
+    <p><strong>Important:</strong> the result is <strong>Ghidra pseudo-C</strong> — an automated best guess at the script logic — <strong>not</strong> a recovered copy of the game's original AGS source files. It is written for Windows users and gamers who are new to Ghidra and reverse engineering.</p>
     <hr>
     <h2 id="before-you-start">Before you start</h2>
     <h3 id="what-you-need">What you need</h3>
@@ -40,6 +65,42 @@
     <blockquote>
     <p><strong>Important:</strong> Use <strong>AGSUnpacker</strong> for the extraction step. Do not substitute another tool for that part.</p>
     </blockquote>
+    <h3 id="words-youll-see">Words you'll see</h3>
+    <p>A few terms this guide uses often:</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Term</th>
+    <th>Plain English</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><strong><code>.scom3</code></strong></td>
+    <td>A compiled AGS script file pulled out of a game — bytecode, not readable source text</td>
+    </tr>
+    <tr>
+    <td><strong>AGSVM</strong></td>
+    <td>The script format Ghidra/ReAGS expects on import (you will confirm this in the Import dialog)</td>
+    </tr>
+    <tr>
+    <td><strong>Project Manager</strong></td>
+    <td>Ghidra's start screen — create projects and import files here</td>
+    </tr>
+    <tr>
+    <td><strong>CodeBrowser</strong></td>
+    <td>Ghidra's analysis window — open a <code>.scom3</code> here to browse and export results</td>
+    </tr>
+    <tr>
+    <td><strong>pseudo-C</strong></td>
+    <td>C-like text Ghidra guesses from the bytecode — not the game's original AGS scripts</td>
+    </tr>
+    <tr>
+    <td><strong>JDK</strong></td>
+    <td>Java Development Kit — Ghidra needs this installed separately</td>
+    </tr>
+    </tbody>
+    </table>
     <h3 id="downloads-bookmark-these">Downloads (bookmark these)</h3>
     <table>
     <thead>
@@ -226,6 +287,32 @@
     <hr>
     <h2 id="step-8-browse-functions-and-decompiled-output-optional">Step 8: Browse functions and decompiled output (optional)</h2>
     <p>This step shows you where Ghidra puts the readable-ish output. You do not need to understand everything here.</p>
+    <table>
+    <thead>
+    <tr>
+    <th>Panel</th>
+    <th>Where</th>
+    <th>What it is</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><strong>Symbol Tree</strong></td>
+    <td>Left sidebar</td>
+    <td>Lists function names found in the script</td>
+    </tr>
+    <tr>
+    <td><strong>Listing</strong></td>
+    <td>Center</td>
+    <td>Low-level view of the compiled script</td>
+    </tr>
+    <tr>
+    <td><strong>Decompile</strong></td>
+    <td>Right</td>
+    <td>Ghidra's pseudo-C output for the function you selected</td>
+    </tr>
+    </tbody>
+    </table>
     <ol>
     <li>In the CodeBrowser <strong>left sidebar</strong>, find <strong><code>Symbol Tree</code></strong>.</li>
     <li>Expand <strong><code>Functions</code></strong>.</li>
@@ -387,6 +474,7 @@
     </tbody>
     </table>
     <hr>
+    </main>
   </div>
   <footer class="site-footer">
     <p>Built from <code>tutorial.md</code> · v0.1.2 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>

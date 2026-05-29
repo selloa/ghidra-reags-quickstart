@@ -18,6 +18,7 @@ desktop.ini
 
 # Author drafts (local only)
 notes/
+issues.md
 
 # MarkView design export (~1 MB); CSS lives in assets/tutorial.css
 tutorial-scaffold.html
