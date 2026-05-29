@@ -87,9 +87,12 @@ def extract_sidebar_nav(body_html: str) -> str:
     if not items:
         return ""
     links = "\n".join(items)
-    return f"""  <aside class="site-sidebar" aria-label="Page sections">
-    <nav>
+    return f"""  <aside class="site-sidebar" id="site-sidebar" aria-label="Page sections">
+    <div class="site-sidebar-header">
       <p class="site-sidebar-title">On this page</p>
+      <button type="button" class="site-sidebar-toggle" id="sidebar-hide" aria-controls="site-sidebar" aria-expanded="true" title="Hide navigation">Hide</button>
+    </div>
+    <nav>
       <ul>
 {links}
       </ul>
@@ -147,6 +150,7 @@ def build_html(meta: dict[str, str], body_html: str, sidebar_nav: str) -> str:
     </div>
   </header>
   <div class="site-layout">
+    <button type="button" class="site-sidebar-show" id="sidebar-show" hidden aria-controls="site-sidebar" title="Show navigation">Show nav</button>
 {sidebar_nav}
     <main id="markview-container" class="markdown-body code-block-scroll">
 {indented}
@@ -168,6 +172,27 @@ def build_html(meta: dict[str, str], body_html: str, sidebar_nav: str) -> str:
   }}
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script>
+  (function () {{
+    var hideBtn = document.getElementById('sidebar-hide');
+    var showBtn = document.getElementById('sidebar-show');
+    var storageKey = 'ghidra-reags-sidebar-hidden';
+
+    function setSidebarHidden(hidden) {{
+      document.body.classList.toggle('sidebar-hidden', hidden);
+      if (hideBtn) hideBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+      if (showBtn) showBtn.hidden = !hidden;
+      try {{ localStorage.setItem(storageKey, hidden ? '1' : '0'); }} catch (e) {{}}
+    }}
+
+    try {{
+      if (localStorage.getItem(storageKey) === '1') setSidebarHidden(true);
+    }} catch (e) {{}}
+
+    if (hideBtn) hideBtn.addEventListener('click', function () {{ setSidebarHidden(true); }});
+    if (showBtn) showBtn.addEventListener('click', function () {{ setSidebarHidden(false); }});
+  }})();
+  </script>
 </body>
 </html>
 """

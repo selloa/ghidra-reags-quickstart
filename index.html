@@ -14,13 +14,17 @@
     <div class="wrap">
       <div id="google_translate_element" class="site-translate"></div>
       <h1>Ghidra-ReAGS Quick Start</h1>
-      <p class="meta">Version 0.1.4 · 2026-05-29 · draft</p>
+      <p class="meta">Version 0.1.5 · 2026-05-29 · draft</p>
     </div>
   </header>
   <div class="site-layout">
-  <aside class="site-sidebar" aria-label="Page sections">
-    <nav>
+    <button type="button" class="site-sidebar-show" id="sidebar-show" hidden aria-controls="site-sidebar" title="Show navigation">Show nav</button>
+  <aside class="site-sidebar" id="site-sidebar" aria-label="Page sections">
+    <div class="site-sidebar-header">
       <p class="site-sidebar-title">On this page</p>
+      <button type="button" class="site-sidebar-toggle" id="sidebar-hide" aria-controls="site-sidebar" aria-expanded="true" title="Hide navigation">Hide</button>
+    </div>
+    <nav>
       <ul>
         <li><a href="#before-you-start">Before you start</a></li>
         <li><a href="#step-1-extract-scom3-scripts-with-agsunpacker">Step 1: Extract .scom3 scripts with AGSUnpacker</a></li>
@@ -488,7 +492,7 @@
     </main>
   </div>
   <footer class="site-footer">
-    <p>Built from <code>tutorial.md</code> · v0.1.4 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
+    <p>Built from <code>tutorial.md</code> · v0.1.5 · 2026-05-29 · <a href="https://github.com/selloa">selloa</a></p>
   </footer>
   <script>
   function googleTranslateElementInit() {
@@ -503,5 +507,26 @@
   }
   </script>
   <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+  <script>
+  (function () {
+    var hideBtn = document.getElementById('sidebar-hide');
+    var showBtn = document.getElementById('sidebar-show');
+    var storageKey = 'ghidra-reags-sidebar-hidden';
+
+    function setSidebarHidden(hidden) {
+      document.body.classList.toggle('sidebar-hidden', hidden);
+      if (hideBtn) hideBtn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+      if (showBtn) showBtn.hidden = !hidden;
+      try { localStorage.setItem(storageKey, hidden ? '1' : '0'); } catch (e) {}
+    }
+
+    try {
+      if (localStorage.getItem(storageKey) === '1') setSidebarHidden(true);
+    } catch (e) {}
+
+    if (hideBtn) hideBtn.addEventListener('click', function () { setSidebarHidden(true); });
+    if (showBtn) showBtn.addEventListener('click', function () { setSidebarHidden(false); });
+  })();
+  </script>
 </body>
 </html>

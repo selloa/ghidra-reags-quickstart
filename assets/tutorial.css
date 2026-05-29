@@ -515,6 +515,10 @@ table tr:nth-child(2n) {
     display: none !important;
   }
 
+  .site-sidebar-show {
+    display: none !important;
+  }
+
   .site-layout {
     display: block;
     max-width: none;
@@ -817,6 +821,53 @@ footer.site-footer code {
   color: #8b949e;
 }
 
+.site-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.site-sidebar-header .site-sidebar-title {
+  margin: 0;
+}
+
+.site-sidebar-toggle,
+.site-sidebar-show {
+  font: inherit;
+  font-size: 0.75rem;
+  color: #8b949e;
+  background: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 4px;
+  padding: 0.25rem 0.55rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.site-sidebar-toggle:hover,
+.site-sidebar-show:hover {
+  color: #58a6ff;
+  border-color: #58a6ff;
+}
+
+.site-sidebar-show {
+  position: sticky;
+  top: 1rem;
+  align-self: flex-start;
+  flex-shrink: 0;
+  margin: 1rem 0 2rem;
+}
+
+body.sidebar-hidden .site-sidebar {
+  display: none;
+}
+
+.site-sidebar-show[hidden] {
+  display: none !important;
+}
+
 .site-sidebar ul {
   list-style: none;
   margin: 0;
@@ -1093,6 +1144,19 @@ body.markdown-export[data-theme="dark"] .site-sidebar a {
 body.markdown-export[data-theme="dark"] .site-sidebar a:hover {
   color: #79c0ff;
   border-left-color: #58a6ff;
+}
+
+body.markdown-export[data-theme="dark"] .site-sidebar-toggle,
+body.markdown-export[data-theme="dark"] .site-sidebar-show {
+  background: #161b22;
+  border-color: #30363d;
+  color: #8b949e;
+}
+
+body.markdown-export[data-theme="dark"] .site-sidebar-toggle:hover,
+body.markdown-export[data-theme="dark"] .site-sidebar-show:hover {
+  color: #79c0ff;
+  border-color: #58a6ff;
 }
 
 body.markdown-export[data-theme="dark"] input[type="checkbox"] {
